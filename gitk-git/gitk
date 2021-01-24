@@ -2663,6 +2663,7 @@ proc makewindow {} {
         {mc "Diff this -> marked commit" command {diffvsmark 0}}
         {mc "Diff marked commit -> this" command {diffvsmark 1}}
         {mc "Revert this commit" command revert}
+        {mc "External diff" command {externaldiff 0}}
     }
     $rowctxmenu configure -tearoff 0
 
@@ -9195,6 +9196,21 @@ proc diffvssel {dirn} {
     }
     addtohistory [list doseldiff $oldid $newid] savectextpos
     doseldiff $oldid $newid
+}
+
+proc externaldiff {dirn} {
+    global rowmenuid selectedline
+    
+    if {$selectedline eq {}} return
+    if {$dirn} {
+        set oldid [commitonrow $selectedline]
+        set newid $rowmenuid
+    } else {
+        set oldid $rowmenuid
+        set newid [commitonrow $selectedline]
+    }
+    
+   exec  git difftool -d $newid $oldid &
 }
 
 proc diffvsmark {dirn} {
