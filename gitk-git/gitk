@@ -9200,7 +9200,7 @@ proc diffvssel {dirn} {
 
 proc externaldiff {dirn} {
     global rowmenuid selectedline
-    global nullid
+    global nullid nullid2
     if {$selectedline eq {}} return
     if {$dirn} {
         set oldid [commitonrow $selectedline]
@@ -9209,8 +9209,16 @@ proc externaldiff {dirn} {
         set oldid $rowmenuid
         set newid [commitonrow $selectedline]
     }
-    if {$newid eq $nullid} {
+
+    if {($newid eq $nullid) && ($oldid eq $nullid2) || ($newid eq $nullid2) && ($oldid eq $nullid)} {
+    } elseif {$newid eq $nullid} {
 	exec git difftool -d $oldid &
+    } elseif {$newid eq $nullid2} {
+	exec git difftool --staged -d $oldid &
+    } elseif {$oldid eq $nullid} {
+	exec git difftool -d $newid &
+    } elseif {$oldid eq $nullid2} {
+	exec git difftool --staged -d $newid &
     } else {
 	exec git difftool -d $newid $oldid &
     }
